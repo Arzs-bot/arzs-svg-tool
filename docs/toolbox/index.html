@@ -40,20 +40,20 @@ body { background:var(--bg); color:var(--text); min-height:100vh;
 .step .connector { width:40px; height:1px; background:var(--border); margin-right:12px; }
 .step.done .connector { background:#000; }
 
-.wrap { max-width:1100px; margin:0 auto; padding:28px 20px 80px; }
+.wrap { max-width:1320px; margin:0 auto; padding:32px 28px 80px; }
 .error { background:#fff0f0; border:1px solid #ffc0c0; color:#cc0000;
   padding:10px 16px; font-size:13px; margin-bottom:14px; border-radius:4px; }
 
 .dropzone { display:block; position:relative; border:2px dashed var(--border);
-  padding:72px 20px; text-align:center; cursor:pointer;
-  transition:border-color .2s, background .2s; margin-top:20px;
+  padding:96px 20px; text-align:center; cursor:pointer;
+  transition:border-color .2s, background .2s; margin-top:24px;
   border-radius:4px; background:var(--surface); }
 .dropzone:hover { border-color:#000; background:#efefef; }
 .dropzone.over { border-color:#000; background:#ebebeb; }
-.dropzone .icon { font-size:32px; margin-bottom:16px; opacity:.18; }
-.dropzone h2 { font-size:16px; font-weight:600; letter-spacing:0.5px; margin-bottom:10px; }
-.dropzone .sub { font-size:13px; color:var(--text-sec); }
-.dropzone .fine { font-size:11px; color:var(--text-faint); margin-top:12px; }
+.dropzone .icon { font-size:40px; margin-bottom:18px; opacity:.18; }
+.dropzone h2 { font-size:18px; font-weight:600; letter-spacing:0.5px; margin-bottom:12px; }
+.dropzone .sub { font-size:14px; color:var(--text-sec); }
+.dropzone .fine { font-size:12px; color:var(--text-faint); margin-top:14px; }
 
 .workspace { display:flex; gap:16px; flex-wrap:wrap; }
 .previews { flex:2.2; min-width:320px; display:flex; gap:14px; flex-wrap:wrap; align-content:flex-start; }
@@ -62,7 +62,7 @@ body { background:var(--bg); color:var(--text); min-height:100vh;
   display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
 .pt .tag { font-size:10px; padding:2px 8px; border:1px solid var(--border);
   color:var(--text-sec); border-radius:100px; white-space:nowrap; }
-.pbox { border:1px solid var(--border); min-height:280px; display:flex;
+.pbox { border:1px solid var(--border); min-height:340px; display:flex;
   align-items:center; justify-content:center; overflow:hidden; padding:8px; border-radius:4px; }
 .pbox.checker-dark { background:repeating-conic-gradient(#e0e0e0 0% 25%, #f0f0f0 0% 50%) 50%/16px 16px; }
 .pbox.checker-light { background:repeating-conic-gradient(#efefef 0% 25%, #fff 0% 50%) 50%/16px 16px; }
