@@ -112,43 +112,27 @@ body { background:var(--bg); color:var(--text); min-height:100vh;
 .hidden { display:none !important; }
 @media (max-width:720px){ .previews{flex-direction:column} }
 
-/* ── Comparison viewer ── */
-.previews { flex:2.2; min-width:320px; display:flex; }
-.cmp-wrap { flex:1; display:flex; flex-direction:column; }
-.cmp-bar { display:flex; align-items:center; gap:8px; margin-bottom:8px;
-  font-size:11px; color:var(--text-faint); flex-wrap:wrap; }
-.cmp-badge { display:flex; align-items:center; gap:6px; }
+/* ── Two-pane layout ── */
+.previews { flex:2.2; min-width:320px; display:flex; gap:14px; flex-wrap:wrap; align-content:flex-start; }
+.pane { flex:1; min-width:220px; display:flex; flex-direction:column; }
+.pane-top { display:flex; align-items:center; gap:8px; margin-bottom:8px;
+  font-size:11px; color:var(--text-faint); flex-wrap:wrap; min-height:26px; }
+.pane-title { font-weight:500; color:var(--text-sec); }
 .zoom-controls { margin-left:auto; display:flex; align-items:center; gap:4px; }
 .zbtn { background:var(--panel); border:1px solid var(--border); color:var(--text);
-  width:26px; height:26px; cursor:pointer; border-radius:4px; font-size:15px; font-weight:400;
+  width:26px; height:26px; cursor:pointer; border-radius:4px; font-size:15px;
   display:inline-flex; align-items:center; justify-content:center; font-family:inherit; }
 .zbtn:hover { background:var(--surface); }
 #zoomLvl { font-size:11px; color:var(--text-sec); min-width:38px; text-align:center; }
 
-.cmp-viewer { position:relative; overflow:hidden; border:1px solid var(--border);
-  border-radius:4px; min-height:420px; flex:1; user-select:none; }
-.cmp-zoom-wrap { position:absolute; inset:0; }
-.cmp-img { position:absolute; inset:0; width:100%; height:100%; }
-.cmp-orig { object-fit:contain; display:block; }
-.cmp-result { display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.cmp-result img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; }
-.cmp-result svg { position:absolute; inset:0; width:100%; height:100%; display:block; }
-.cmp-result .spin, .cmp-result .ph { position:relative; color:var(--text-sec); font-size:13px; }
-
-.cmp-divider { position:absolute; top:0; bottom:0; left:50%; transform:translateX(-50%);
-  width:3px; background:#fff; box-shadow:0 0 8px rgba(0,0,0,.35);
-  cursor:ew-resize; z-index:20; }
-.cmp-knob { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  width:38px; height:38px; background:#fff; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  box-shadow:0 2px 8px rgba(0,0,0,.25); }
-.cmp-knob svg { pointer-events:none; }
-
-.cmp-label { position:absolute; top:12px; font-size:10px; font-weight:600;
-  letter-spacing:1px; color:#fff; background:rgba(0,0,0,.45); padding:3px 10px;
-  border-radius:100px; pointer-events:none; z-index:10; text-transform:uppercase; }
-.cmp-label-l { left:12px; }
-.cmp-label-r { right:12px; }
+.pane-viewer { position:relative; overflow:hidden; border:1px solid var(--border);
+  border-radius:4px; min-height:340px; flex:1; }
+.pane-img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; }
+.pane-result { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  transform-origin:50% 50%; }
+.pane-result img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; }
+.pane-result svg { position:absolute; inset:0; width:100%; height:100%; display:block; }
+.pane-result .spin, .pane-result .ph { position:relative; font-size:13px; color:var(--text-sec); }
 </style>
 </head>
 <body>
@@ -180,11 +164,19 @@ body { background:var(--bg); color:var(--text); min-height:100vh;
   <div id="workspace" class="hidden">
     <div class="workspace">
       <div class="previews">
-        <div class="cmp-wrap">
-          <div class="cmp-bar">
-            <span class="cmp-badge">原始 <span class="tag" id="origInfo"></span></span>
-            <span style="color:var(--border)">|</span>
-            <span class="cmp-badge"><span id="resultLabel">結果</span> <span class="tag hidden" id="resultInfo"></span></span>
+        <div class="pane">
+          <div class="pane-top">
+            <span class="pane-title">原始圖片</span>
+            <span class="tag" id="origInfo"></span>
+          </div>
+          <div class="pane-viewer checker-dark">
+            <img id="origImg" class="pane-img" alt="原始圖片">
+          </div>
+        </div>
+        <div class="pane">
+          <div class="pane-top">
+            <span class="pane-title" id="resultLabel">處理結果</span>
+            <span class="tag hidden" id="resultInfo"></span>
             <div class="zoom-controls">
               <button class="zbtn" id="zoomOut" title="縮小">−</button>
               <span id="zoomLvl">100%</span>
@@ -192,20 +184,8 @@ body { background:var(--bg); color:var(--text); min-height:100vh;
               <button class="zbtn" id="zoomReset" title="重置">⊡</button>
             </div>
           </div>
-          <div class="cmp-viewer checker-dark" id="cmpViewer">
-            <div id="zoomWrap" class="cmp-zoom-wrap">
-              <img id="origImg" class="cmp-img cmp-orig" alt="原始圖片">
-              <div id="resultBox" class="cmp-img cmp-result"><span class="ph">選擇模式後開始處理</span></div>
-              <div class="cmp-divider hidden" id="cmpDivider">
-                <div class="cmp-knob">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <path d="M6 3.5L2.5 9 6 14.5M12 3.5L15.5 9 12 14.5" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
-              </div>
-              <span class="cmp-label cmp-label-l">前</span>
-              <span class="cmp-label cmp-label-r hidden" id="cmpLabelR">後</span>
-            </div>
+          <div class="pane-viewer checker-dark" id="resultPane">
+            <div id="resultBox" class="pane-result"><span class="ph">選擇模式後開始處理</span></div>
           </div>
         </div>
       </div>
@@ -227,7 +207,7 @@ body { background:var(--bg); color:var(--text); min-height:100vh;
           <h4>向量化參數</h4>
           <div class="ctl">
             <label><span>色彩層級</span><b id="vPoster">5</b></label>
-            <input type="range" id="rPoster" min="2" max="12" value="5">
+            <input type="range" id="rPoster" min="2" max="12" value="3">
           </div>
           <div class="ctl">
             <label><span>雜點過濾</span><b id="vTurd">2</b></label>
@@ -361,7 +341,7 @@ var Module=typeof Module!=="undefined"?Module:{};var moduleOverrides={};var key;
     resultBox.innerHTML='<span class="ph">選擇模式後開始處理</span>';
     resultInfo.classList.add('hidden');
     btnPng.disabled=true; btnSvg.disabled=true;
-    resetCmp();
+    resetZoom();
   }
 
   $('fileInput').addEventListener('change',e=>{handleFile(e.target.files[0]); e.target.value='';});
@@ -476,66 +456,24 @@ var Module=typeof Module!=="undefined"?Module:{};var moduleOverrides={};var key;
       showError('處理失敗：'+(e.message||e)+(String(e).includes('import')?'（AI 模型需要網路連線）':''));
     }
     btnGo.disabled=false;
-    if(!errorBox||errorBox.classList.contains('hidden')) activateCmp();
   });
 
-  // ── Comparison slider + Zoom（座標統一）──
-  const cmpViewer=$('cmpViewer'), cmpDivider=$('cmpDivider'), cmpLabelR=$('cmpLabelR');
-  const zoomWrap=document.getElementById('zoomWrap');
+  // ── 結果欄縮放 ──
+  const resultPane=document.getElementById('resultPane');
   const zoomLvlEl=$('zoomLvl');
-  let sliderVisual=50, isDrag=false, zoom=1, ox=50, oy=50;
-
-  // 視覺% → 布局%（zoom wrapper 座標）
-  function toLayout(vPct){ return (vPct-ox)/zoom+ox; }
-
-  function setSlider(vPct){
-    sliderVisual=Math.max(2,Math.min(98,vPct));
-    const lp=Math.max(0.1,Math.min(99.9,toLayout(sliderVisual)));
-    origImg.style.clipPath='inset(0 '+(100-lp)+'% 0 0)';
-    resultBox.style.clipPath='inset(0 0 0 '+lp+'%)';
-    cmpDivider.style.left=lp+'%';
-  }
-  function activateCmp(){
-    cmpDivider.classList.remove('hidden');
-    cmpLabelR.classList.remove('hidden');
-    setSlider(50);
-  }
-  function resetCmp(){
-    origImg.style.clipPath='';
-    resultBox.style.clipPath='';
-    cmpDivider.classList.add('hidden');
-    cmpLabelR.classList.add('hidden');
-  }
-
-  // 拖拉（從 viewer 取視覺位置）
-  cmpDivider.addEventListener('mousedown',e=>{isDrag=true;e.preventDefault();});
-  document.addEventListener('mousemove',e=>{
-    if(!isDrag)return;
-    const r=cmpViewer.getBoundingClientRect();
-    setSlider((e.clientX-r.left)/r.width*100);
-  });
-  document.addEventListener('mouseup',()=>isDrag=false);
-  cmpDivider.addEventListener('touchstart',e=>{isDrag=true;e.preventDefault();},{passive:false});
-  document.addEventListener('touchmove',e=>{
-    if(!isDrag)return;
-    const r=cmpViewer.getBoundingClientRect();
-    setSlider((e.touches[0].clientX-r.left)/r.width*100);
-  },{passive:false});
-  document.addEventListener('touchend',()=>isDrag=false);
-
-  // 縮放（整體 wrapper scale，clip-path 自動同步）
+  let zoom=1, ox=50, oy=50;
   function applyZoom(){
-    zoomWrap.style.transformOrigin=ox+'% '+oy+'%';
-    zoomWrap.style.transform='scale('+zoom+')';
+    resultBox.style.transformOrigin=ox+'% '+oy+'%';
+    resultBox.style.transform='scale('+zoom+')';
     zoomLvlEl.textContent=Math.round(zoom*100)+'%';
-    if(!cmpDivider.classList.contains('hidden')) setSlider(sliderVisual);
   }
-  $('zoomIn').onclick=()=>{zoom=Math.min(4,zoom*1.5);applyZoom();};
-  $('zoomOut').onclick=()=>{zoom=Math.max(.25,zoom/1.5);applyZoom();};
-  $('zoomReset').onclick=()=>{zoom=1;ox=50;oy=50;applyZoom();};
-  cmpViewer.addEventListener('wheel',e=>{
+  function resetZoom(){ zoom=1; ox=50; oy=50; applyZoom(); }
+  $('zoomIn').onclick=()=>{ zoom=Math.min(4,zoom*1.5); applyZoom(); };
+  $('zoomOut').onclick=()=>{ zoom=Math.max(.25,zoom/1.5); applyZoom(); };
+  $('zoomReset').onclick=resetZoom;
+  resultPane.addEventListener('wheel',e=>{
     e.preventDefault();
-    const r=cmpViewer.getBoundingClientRect();
+    const r=resultPane.getBoundingClientRect();
     ox=(e.clientX-r.left)/r.width*100;
     oy=(e.clientY-r.top)/r.height*100;
     zoom=Math.max(.25,Math.min(4,zoom*(e.deltaY<0?1.1:.9)));
