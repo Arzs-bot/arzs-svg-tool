@@ -308,7 +308,7 @@ var Module=typeof Module!=="undefined"?Module:{};var moduleOverrides={};var key;
     const mod = await loadImgly();
     setStatus('AI 去背處理中...<br>（依裝置效能約 5~30 秒）');
     const blob = await mod.removeBackground(inputUrl, {
-      publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/dist/',
+      publicPath: 'https://staticimgly.com/@imgly/background-removal-data/1.7.0/dist/',
       output:{ format:'image/png' },
       progress:(key,cur,total)=>{
         if(key.startsWith('fetch')) setStatus('下載 AI 模型中... '+Math.round(cur/total*100)+'%');
