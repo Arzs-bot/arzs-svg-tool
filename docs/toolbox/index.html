@@ -358,6 +358,7 @@ var Module=typeof Module!=="undefined"?Module:{};var moduleOverrides={};var key;
     resultBox.innerHTML='<span class="ph">選擇模式後開始處理</span>';
     resultInfo.classList.add('hidden');
     btnPng.disabled=true; btnSvg.disabled=true;
+    resetCmp();
   }
 
   $('fileInput').addEventListener('change',e=>{handleFile(e.target.files[0]); e.target.value='';});
@@ -480,13 +481,21 @@ var Module=typeof Module!=="undefined"?Module:{};var moduleOverrides={};var key;
   let sliderPct=50, isDrag=false;
   function setSlider(pct){
     sliderPct=Math.max(2,Math.min(98,pct));
-    cmpDivider.style.left=sliderPct+'%';
+    const right=100-sliderPct;
+    origImg.style.clipPath='inset(0 '+right+'% 0 0)';
     resultBox.style.clipPath='inset(0 0 0 '+sliderPct+'%)';
+    cmpDivider.style.left=sliderPct+'%';
   }
   function activateCmp(){
     cmpDivider.classList.remove('hidden');
     cmpLabelR.classList.remove('hidden');
     setSlider(50);
+  }
+  function resetCmp(){
+    origImg.style.clipPath='';
+    resultBox.style.clipPath='';
+    cmpDivider.classList.add('hidden');
+    cmpLabelR.classList.add('hidden');
   }
   cmpDivider.addEventListener('mousedown',e=>{isDrag=true;e.preventDefault();});
   document.addEventListener('mousemove',e=>{
