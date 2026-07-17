@@ -7,84 +7,108 @@
 <meta name="description" content="免費線上圖片工具：AI 智慧去背轉透明 PNG、圖片轉 SVG 向量圖。支援 AI 生成圖片，所有運算在瀏覽器完成，圖片不上傳。由 ARZS 阿爾斯提供。">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-:root { --bg:#0a0a0a; --panel:#111; --line:#222; --line2:#333;
-  --dim:rgba(255,255,255,.55); --faint:rgba(255,255,255,.3); }
-body { background:var(--bg); color:#fff; min-height:100vh;
-  font-family:'Inter','PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif; }
-.topbar { background:#000; border-bottom:1px solid var(--line);
-  padding:14px 24px; display:flex; align-items:center; gap:20px; }
-.brand { font-weight:700; letter-spacing:3px; font-size:16px; color:#fff; text-decoration:none; }
-.tdiv { width:1px; height:16px; background:var(--line2); }
-.toolname { font-size:12px; letter-spacing:2px; color:var(--dim); }
-.estatus { margin-left:auto; font-size:10px; color:var(--faint); letter-spacing:1px; }
+:root {
+  --bg: #ffffff;
+  --surface: #f5f5f5;
+  --panel: #ffffff;
+  --border: #dfdfdf;
+  --text: #000000;
+  --text-sec: rgba(18,18,18,0.6);
+  --text-faint: rgba(18,18,18,0.38);
+}
+body { background:var(--bg); color:var(--text); min-height:100vh;
+  font-family:'Inter','PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;
+  font-size:14px; line-height:1.6; }
 
-.pipeline { display:flex; justify-content:center; padding:26px 12px 6px; flex-wrap:wrap; }
+.topbar { background:#fff; border-bottom:1px solid var(--border);
+  padding:14px 24px; display:flex; align-items:center; gap:16px; }
+.brand { font-weight:700; letter-spacing:3px; font-size:15px; color:#000; text-decoration:none; }
+.tdiv { width:1px; height:16px; background:var(--border); }
+.toolname { font-size:12px; letter-spacing:1px; color:var(--text-sec); }
+.estatus { margin-left:auto; font-size:11px; color:var(--text-faint); letter-spacing:0.5px; }
+
+.pipeline { display:flex; justify-content:center; padding:24px 12px 20px; flex-wrap:wrap;
+  background:#fff; border-bottom:1px solid var(--border); gap:0; }
 .step { display:flex; align-items:center; }
-.step .dot { width:30px; height:30px; border:1px solid var(--line2); display:flex;
-  align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
-.step.done .dot { background:#fff; color:#000; border-color:#fff; font-weight:700; }
-.step.active .dot { border-color:#fff; font-weight:700; }
-.step .slabel { font-size:12px; letter-spacing:2px; margin:0 14px 0 10px; color:var(--faint); white-space:nowrap; }
-.step.done .slabel, .step.active .slabel { color:#fff; }
-.step .connector { width:40px; height:1px; background:var(--line2); margin-right:14px; }
-.step.done .connector { background:#666; }
+.step .dot { width:28px; height:28px; border:1.5px solid var(--border); border-radius:50%; display:flex;
+  align-items:center; justify-content:center; font-size:11px; font-weight:600;
+  flex-shrink:0; color:var(--text-faint); }
+.step.done .dot { background:#000; color:#fff; border-color:#000; }
+.step.active .dot { border-color:#000; color:#000; }
+.step .slabel { font-size:12px; letter-spacing:0.5px; margin:0 12px 0 8px; color:var(--text-faint); white-space:nowrap; }
+.step.done .slabel, .step.active .slabel { color:var(--text); font-weight:500; }
+.step .connector { width:40px; height:1px; background:var(--border); margin-right:12px; }
+.step.done .connector { background:#000; }
 
-.wrap { max-width:1100px; margin:0 auto; padding:18px 16px 60px; }
-.error { background:#2a1215; border:1px solid #5c2226; color:#ff8f8f;
-  padding:10px 16px; font-size:13px; margin-bottom:14px; }
+.wrap { max-width:1100px; margin:0 auto; padding:28px 20px 80px; }
+.error { background:#fff0f0; border:1px solid #ffc0c0; color:#cc0000;
+  padding:10px 16px; font-size:13px; margin-bottom:14px; border-radius:4px; }
 
-.dropzone { display:block; position:relative; border:2px dashed var(--line2);
-  padding:70px 20px; text-align:center; cursor:pointer; transition:border-color .2s; margin-top:20px; }
-.dropzone.over { border-color:#fff; }
-.dropzone .icon { font-size:40px; margin-bottom:16px; opacity:.25; }
-.dropzone h2 { font-size:17px; font-weight:600; letter-spacing:2px; margin-bottom:10px; }
-.dropzone .sub { font-size:13px; color:var(--dim); }
-.dropzone .fine { font-size:11px; color:var(--faint); margin-top:14px; }
+.dropzone { display:block; position:relative; border:2px dashed var(--border);
+  padding:72px 20px; text-align:center; cursor:pointer;
+  transition:border-color .2s, background .2s; margin-top:20px;
+  border-radius:4px; background:var(--surface); }
+.dropzone:hover { border-color:#000; background:#efefef; }
+.dropzone.over { border-color:#000; background:#ebebeb; }
+.dropzone .icon { font-size:32px; margin-bottom:16px; opacity:.18; }
+.dropzone h2 { font-size:16px; font-weight:600; letter-spacing:0.5px; margin-bottom:10px; }
+.dropzone .sub { font-size:13px; color:var(--text-sec); }
+.dropzone .fine { font-size:11px; color:var(--text-faint); margin-top:12px; }
 
 .workspace { display:flex; gap:16px; flex-wrap:wrap; }
 .previews { flex:2.2; min-width:320px; display:flex; gap:14px; flex-wrap:wrap; align-content:flex-start; }
 .pv { flex:1; min-width:220px; }
-.pt { font-size:11px; letter-spacing:2px; color:var(--faint); margin-bottom:8px;
+.pt { font-size:11px; letter-spacing:0.5px; color:var(--text-faint); margin-bottom:8px;
   display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
-.pt .tag { font-size:10px; padding:2px 8px; border:1px solid var(--line2); color:var(--dim); white-space:nowrap; }
-.pbox { border:1px solid var(--line); min-height:280px; display:flex;
-  align-items:center; justify-content:center; overflow:hidden; padding:8px; }
-.pbox.checker-dark { background:repeating-conic-gradient(#161616 0% 25%, #1e1e1e 0% 50%) 50%/16px 16px; }
-.pbox.checker-light { background:repeating-conic-gradient(#ececec 0% 25%, #fff 0% 50%) 50%/16px 16px; }
+.pt .tag { font-size:10px; padding:2px 8px; border:1px solid var(--border);
+  color:var(--text-sec); border-radius:100px; white-space:nowrap; }
+.pbox { border:1px solid var(--border); min-height:280px; display:flex;
+  align-items:center; justify-content:center; overflow:hidden; padding:8px; border-radius:4px; }
+.pbox.checker-dark { background:repeating-conic-gradient(#e0e0e0 0% 25%, #f0f0f0 0% 50%) 50%/16px 16px; }
+.pbox.checker-light { background:repeating-conic-gradient(#efefef 0% 25%, #fff 0% 50%) 50%/16px 16px; }
 .pbox img, .pbox svg { max-width:100%; max-height:420px; display:block; height:auto; }
-.spin { color:#999; font-size:13px; letter-spacing:1px; text-align:center; line-height:1.9; }
-.ph { color:#aaa; font-size:13px; }
+.spin { color:var(--text-sec); font-size:13px; text-align:center; line-height:1.9; }
+.ph { color:var(--text-faint); font-size:13px; }
 
 .rail { flex:1; min-width:250px; }
-.card { background:var(--panel); border:1px solid var(--line); padding:16px 18px; margin-bottom:14px; }
-.card h4 { font-size:11px; letter-spacing:2px; color:var(--dim); font-weight:600; margin-bottom:14px; }
-.mode-tabs { display:flex; border:1px solid var(--line2); margin-bottom:14px; }
-.mt { flex:1; text-align:center; padding:10px 2px; font-size:12px;
-  letter-spacing:1px; color:var(--faint); cursor:pointer; user-select:none; }
-.mt.on { background:#fff; color:#000; font-weight:700; }
+.card { background:var(--panel); border:1px solid var(--border); padding:16px 18px;
+  margin-bottom:12px; border-radius:4px; }
+.card h4 { font-size:11px; letter-spacing:1.5px; color:var(--text-sec);
+  font-weight:600; margin-bottom:14px; text-transform:uppercase; }
+.mode-tabs { display:flex; border:1px solid var(--border); margin-bottom:14px;
+  border-radius:4px; overflow:hidden; }
+.mt { flex:1; text-align:center; padding:9px 2px; font-size:12px;
+  letter-spacing:0.5px; color:var(--text-sec); cursor:pointer; user-select:none; }
+.mt.on { background:#000; color:#fff; font-weight:600; }
+.mt:not(.on):hover { background:var(--surface); }
 .ctl { margin-bottom:13px; }
 .ctl label { display:flex; justify-content:space-between; font-size:11px;
-  letter-spacing:1px; color:var(--dim); margin-bottom:6px; }
-.ctl label b { color:#fff; font-weight:600; }
-.ctl input[type=range] { width:100%; accent-color:#fff; }
-.chkrow { display:flex; align-items:center; gap:9px; font-size:12px; color:var(--dim);
+  letter-spacing:0.5px; color:var(--text-sec); margin-bottom:6px; }
+.ctl label b { color:#000; font-weight:600; }
+.ctl input[type=range] { width:100%; accent-color:#000; }
+.chkrow { display:flex; align-items:center; gap:9px; font-size:12px; color:var(--text-sec);
   margin-bottom:8px; cursor:pointer; }
-.chkrow input { accent-color:#fff; }
+.chkrow input { accent-color:#000; }
 .btn { display:block; width:100%; text-align:center; padding:12px;
-  font-size:13px; font-weight:600; letter-spacing:2px; cursor:pointer; border:none; margin-bottom:8px;
-  font-family:inherit; }
-.btn.solid { background:#fff; color:#000; }
-.btn.solid:disabled { opacity:.4; cursor:wait; }
-.btn.line { background:transparent; color:var(--dim); border:1px solid var(--line2); }
+  font-size:13px; font-weight:600; letter-spacing:1px; cursor:pointer;
+  border:none; margin-bottom:8px; font-family:inherit;
+  border-radius:14px; transition:background .15s, color .15s, opacity .15s; }
+.btn.solid { background:#000; color:#fff; border:1px solid #000; }
+.btn.solid:hover { background:#333; border-color:#333; }
+.btn.solid:disabled { opacity:.35; cursor:wait; }
+.btn.line { background:transparent; color:#000; border:1px solid #000; }
+.btn.line:hover { background:var(--surface); }
 .btn.line:disabled { opacity:.3; cursor:default; }
 .row2 { display:flex; gap:8px; }
 .row2 .btn { flex:1; }
 
-.cta { border-top:1px solid var(--line); margin-top:48px; padding-top:32px; text-align:center; }
-.cta h3 { font-size:15px; font-weight:700; letter-spacing:3px; margin-bottom:8px; }
-.cta p { font-size:12px; color:var(--faint); letter-spacing:1px; margin-bottom:18px; }
-.cta a { display:inline-block; background:#fff; color:#000; padding:11px 30px;
-  font-size:13px; font-weight:600; letter-spacing:3px; text-decoration:none; }
+.cta { border-top:2px solid #000; margin-top:56px; padding-top:40px; text-align:center; }
+.cta h3 { font-size:18px; font-weight:700; letter-spacing:1.5px; margin-bottom:10px; }
+.cta p { font-size:13px; color:var(--text-sec); letter-spacing:0.3px; margin-bottom:22px; line-height:1.8; }
+.cta a { display:inline-block; background:#000; color:#fff; padding:12px 32px;
+  font-size:13px; font-weight:600; letter-spacing:1.5px; text-decoration:none;
+  border-radius:14px; transition:background .15s; }
+.cta a:hover { background:#333; }
 .hidden { display:none !important; }
 @media (max-width:720px){ .previews{flex-direction:column} }
 </style>
@@ -94,8 +118,8 @@ body { background:var(--bg); color:#fff; min-height:100vh;
 <div class="topbar">
   <a class="brand" href="https://arzs.com.tw">ARZS</a>
   <span class="tdiv"></span>
-  <span class="toolname">圖片工具箱 — 去背 × 向量化</span>
-  <span class="estatus" id="estatus">○ 引擎載入中</span>
+  <span class="toolname">免費圖片工具箱</span>
+  <span class="estatus" id="estatus">引擎載入中…</span>
 </div>
 
 <div class="pipeline" id="pipeline">
@@ -109,9 +133,9 @@ body { background:var(--bg); color:#fff; min-height:100vh;
 
   <label class="dropzone" id="dropzone" for="fileInput">
     <input type="file" id="fileInput" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0;">
-    <div class="icon">⬡</div>
-    <h2>點擊上傳圖片（或拖曳 / Ctrl+V 貼上）</h2>
-    <div class="sub">支援 PNG · JPG · WebP — AI 生成圖片也可以</div>
+    <div class="icon">↑</div>
+    <h2>點擊上傳圖片，或直接拖曳 / Ctrl+V 貼上</h2>
+    <div class="sub">支援 PNG · JPG · WebP，AI 生成圖片也可以</div>
     <div class="fine">所有運算在你的瀏覽器完成，圖片不會上傳到任何伺服器</div>
   </label>
 
