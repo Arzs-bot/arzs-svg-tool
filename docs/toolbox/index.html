@@ -127,6 +127,7 @@ body { background:var(--bg); color:var(--text); min-height:100vh;
 
 .cmp-viewer { position:relative; overflow:hidden; border:1px solid var(--border);
   border-radius:4px; min-height:420px; flex:1; user-select:none; }
+.cmp-zoom-wrap { position:absolute; inset:0; }
 .cmp-img { position:absolute; inset:0; width:100%; height:100%; }
 .cmp-orig { object-fit:contain; display:block; }
 .cmp-result { display:flex; align-items:center; justify-content:center; overflow:hidden; }
@@ -192,17 +193,19 @@ body { background:var(--bg); color:var(--text); min-height:100vh;
             </div>
           </div>
           <div class="cmp-viewer checker-dark" id="cmpViewer">
-            <img id="origImg" class="cmp-img cmp-orig" alt="原始圖片">
-            <div id="resultBox" class="cmp-img cmp-result"><span class="ph">選擇模式後開始處理</span></div>
-            <div class="cmp-divider hidden" id="cmpDivider">
-              <div class="cmp-knob">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <path d="M6 3.5L2.5 9 6 14.5M12 3.5L15.5 9 12 14.5" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+            <div id="zoomWrap" class="cmp-zoom-wrap">
+              <img id="origImg" class="cmp-img cmp-orig" alt="原始圖片">
+              <div id="resultBox" class="cmp-img cmp-result"><span class="ph">選擇模式後開始處理</span></div>
+              <div class="cmp-divider hidden" id="cmpDivider">
+                <div class="cmp-knob">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path d="M6 3.5L2.5 9 6 14.5M12 3.5L15.5 9 12 14.5" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
               </div>
+              <span class="cmp-label cmp-label-l">前</span>
+              <span class="cmp-label cmp-label-r hidden" id="cmpLabelR">後</span>
             </div>
-            <span class="cmp-label cmp-label-l">前</span>
-            <span class="cmp-label cmp-label-r hidden" id="cmpLabelR">後</span>
           </div>
         </div>
       </div>
@@ -476,15 +479,21 @@ var Module=typeof Module!=="undefined"?Module:{};var moduleOverrides={};var key;
     if(!errorBox||errorBox.classList.contains('hidden')) activateCmp();
   });
 
-  // ── Comparison slider ──
+  // ── Comparison slider + Zoom（座標統一）──
   const cmpViewer=$('cmpViewer'), cmpDivider=$('cmpDivider'), cmpLabelR=$('cmpLabelR');
-  let sliderPct=50, isDrag=false;
-  function setSlider(pct){
-    sliderPct=Math.max(2,Math.min(98,pct));
-    const right=100-sliderPct;
-    origImg.style.clipPath='inset(0 '+right+'% 0 0)';
-    resultBox.style.clipPath='inset(0 0 0 '+sliderPct+'%)';
-    cmpDivider.style.left=sliderPct+'%';
+  const zoomWrap=document.getElementById('zoomWrap');
+  const zoomLvlEl=$('zoomLvl');
+  let sliderVisual=50, isDrag=false, zoom=1, ox=50, oy=50;
+
+  // 視覺% → 布局%（zoom wrapper 座標）
+  function toLayout(vPct){ return (vPct-ox)/zoom+ox; }
+
+  function setSlider(vPct){
+    sliderVisual=Math.max(2,Math.min(98,vPct));
+    const lp=Math.max(0.1,Math.min(99.9,toLayout(sliderVisual)));
+    origImg.style.clipPath='inset(0 '+(100-lp)+'% 0 0)';
+    resultBox.style.clipPath='inset(0 0 0 '+lp+'%)';
+    cmpDivider.style.left=lp+'%';
   }
   function activateCmp(){
     cmpDivider.classList.remove('hidden');
@@ -497,6 +506,8 @@ var Module=typeof Module!=="undefined"?Module:{};var moduleOverrides={};var key;
     cmpDivider.classList.add('hidden');
     cmpLabelR.classList.add('hidden');
   }
+
+  // 拖拉（從 viewer 取視覺位置）
   cmpDivider.addEventListener('mousedown',e=>{isDrag=true;e.preventDefault();});
   document.addEventListener('mousemove',e=>{
     if(!isDrag)return;
@@ -512,17 +523,12 @@ var Module=typeof Module!=="undefined"?Module:{};var moduleOverrides={};var key;
   },{passive:false});
   document.addEventListener('touchend',()=>isDrag=false);
 
-  // ── Zoom ──
-  let zoom=1, ox=50, oy=50;
-  const zoomLvlEl=$('zoomLvl');
+  // 縮放（整體 wrapper scale，clip-path 自動同步）
   function applyZoom(){
-    ['.cmp-orig','.cmp-result','.cmp-divider','.cmp-label'].forEach(sel=>{
-      cmpViewer.querySelectorAll(sel).forEach(el=>{
-        el.style.transformOrigin=ox+'% '+oy+'%';
-        el.style.transform='scale('+zoom+')';
-      });
-    });
+    zoomWrap.style.transformOrigin=ox+'% '+oy+'%';
+    zoomWrap.style.transform='scale('+zoom+')';
     zoomLvlEl.textContent=Math.round(zoom*100)+'%';
+    if(!cmpDivider.classList.contains('hidden')) setSlider(sliderVisual);
   }
   $('zoomIn').onclick=()=>{zoom=Math.min(4,zoom*1.5);applyZoom();};
   $('zoomOut').onclick=()=>{zoom=Math.max(.25,zoom/1.5);applyZoom();};
