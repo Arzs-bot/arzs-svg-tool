@@ -1,0 +1,19 @@
+# secrets
+.env
+.env.*
+*.env
+*.key
+*.pem
+*.jwk
+*.jwk.json
+*secret*
+*credential*
+# Node
+node_modules/
+# Claude Code settings（機器相關，不進 git）
+.claude/
+settings.local.json
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
