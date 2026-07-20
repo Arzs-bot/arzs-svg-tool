@@ -63,6 +63,17 @@ gh api repos/$(gh api user -q .login)/arzs-svg-tool/pages \
    - `https://tools.arzs.com.tw/` → SVGcode 向量化工具（介面可切繁中）
    - `https://tools.arzs.com.tw/toolbox/` → ARZS 圖片工具箱（去背+向量一條龍）
 
+## ⚠️ 血淚教訓（2026-07-21）：這個 repo 必須維持 public，否則全站 404
+
+- 本站靠 **GitHub Pages** 服務 `tools.arzs.com.tw`。**免費方案的私有 repo 不能跑 Pages。**
+- `2026-07-19` 那波「全 repo 轉 GitHub Private」把本 repo 一起轉私有，Pages 被自動停用，
+  全站 404（Shopify 嵌入也跟著掛）。**這個 repo 是 GPL-2.0 開源工具、無任何 ARZS 機密，
+  本來就該 public，不要再把它轉 private。**
+- 正式綁定的 repo 是 **`arzs-svg-tool`**（不是 `arzs-vector-bg-remove`——後者是重複品，
+  已移除 CNAME 並封存）。本機資料夾的 remote 指向 `arzs-svg-tool`。
+- 若哪天又 404，先查：(1) repo 是否又變 private？(2) `gh api repos/Arzs-bot/arzs-svg-tool/pages`
+  是否還在？(3) 憑證是否為 `CN=tools.arzs.com.tw`（不是 `*.github.io`）。
+
 ## 注意事項
 
 - **不要改動 docs/ 裡的任何檔案內容**——SVGcode 是官方 build 成品，改壞了會整站掛掉
